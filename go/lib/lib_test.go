@@ -48,6 +48,11 @@ func TestGetYaml(t *testing.T) {
 			valuesYaml:          "",
 			expectedReturnValue: `{"yaml":"","err":"template: template:3: unexpected \u003c.\u003e in operand"}`,
 		},
+		{
+			templateYaml:        "\nname: {{ .Values.foobar | what }}",
+			valuesYaml:          "",
+			expectedReturnValue: `{"yaml":"","err":"template: template:2: function \"what\" not defined"}`,
+		},
 	}
 
 	for _, tc := range tests {
