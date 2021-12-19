@@ -20,7 +20,7 @@ jobs:
       - run: git config --global user.email 'bot'
       - run: rm .gitignore
       - run: |
-          git diff --stat | grep dist --quiet && {
+          git diff --stat | grep dist --invert-match --quiet || {
             echo "There were changes. Committing.";
             git add dist/*;
             git commit -m "[GitHub action] WASM module";
