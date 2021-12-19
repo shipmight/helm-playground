@@ -15,8 +15,11 @@ jobs:
           go-version: '1.15'
       - run: go version
       - run: make build
-      - run: |
+      - name: Push commit to branch
+        run: |
           rm .gitignore
+          git config --global user.name 'GitHub Action'
+          git config --global user.email 'martti@marttilaine.com'
           git add dist/*
           git commit -m "[GitHub action] WASM module"
           git push
