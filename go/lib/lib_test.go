@@ -15,21 +15,29 @@ func TestGetYaml(t *testing.T) {
 			valuesYaml:          "",
 			expectedReturnValue: `{"yaml":"","err":""}`,
 		},
+
+		// Values
 		{
 			templateYaml:        "name: {{ .Values.foobar }}",
 			valuesYaml:          "foobar: hello",
 			expectedReturnValue: `{"yaml":"name: hello","err":""}`,
 		},
+
+		// Template functions
 		{
 			templateYaml:        "name: {{ .Values.foobar | default \"fallback\" }}",
 			valuesYaml:          "",
 			expectedReturnValue: `{"yaml":"name: fallback","err":""}`,
 		},
+
+		// Helm built-in template functions
 		{
 			templateYaml:        "name: {{ .Values.foobar | toYaml }}",
 			valuesYaml:          "foobar: ['first', 'second']",
 			expectedReturnValue: `{"yaml":"name: - first\n- second","err":""}`,
 		},
+
+		// Template formatting error
 		{
 			templateYaml:        "name: {{ .Values. }}",
 			valuesYaml:          "",
