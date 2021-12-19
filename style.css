@@ -22,6 +22,7 @@
   --top-color: #f8fafc;
 
   --label-bg: #e2e8f0;
+  --label-color: #1e293b;
 
   --placeholder-color: #64748b;
 
@@ -36,6 +37,32 @@
   --error-bg: #fecaca;
   --error-color: #7f1d1d;
   --error-border: #dc2626;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --app-bg: #334155;
+
+    --top-bg: #1e293b;
+    --top-color: #e2e8f0;
+
+    --label-bg: #475569;
+    --label-color: #f1f5f9;
+
+    --placeholder-color: #cbd5e1;
+
+    --overlay-bg: rgba(51, 65, 85, 0.8);
+    --overlay-color: #e2e8f0;
+    --overlay-dim: #cbd5e1;
+
+    --start-bg: #6366f1;
+    --start-shadow: #a5b4fc;
+    --start-color: #eef2ff;
+
+    --error-bg: #ef4444;
+    --error-color: #fef2f2;
+    --error-border: #ef4444;
+  }
 }
 
 body {
@@ -91,6 +118,7 @@ body {
 
 .label {
   background-color: var(--label-bg);
+  color: var(--label-color);
   padding: 8px 16px;
   font-weight: var(--font-weight-semibold);
 }
@@ -126,6 +154,7 @@ body {
 .overlay p {
   max-width: 400px;
   margin: 8px 0;
+  padding: 0 8px;
   text-align: center;
 }
 
@@ -163,4 +192,15 @@ body {
   background-color: var(--error-bg);
   color: var(--error-color);
   border-left: 2px solid var(--error-border);
+}
+
+@media all and (max-width: 799px) {
+  .content {
+    flex-direction: column;
+  }
+
+  .column.column {
+    width: 100%;
+    border-left: none;
+  }
 }
