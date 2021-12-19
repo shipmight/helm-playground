@@ -124,6 +124,12 @@
       const startButton = document.querySelector('.start');
       const errorNotification = document.querySelector('.error');
 
+      const formatError = (err) => {
+        err = err.replace('template: ', 'template.yaml - ');
+        err = err.replace('yaml: ', 'values.yaml - ');
+        return err;
+      };
+
       startButton.addEventListener('click', () => {
         startButton.disabled = true;
         startButton.textContent = 'Loading…';
@@ -141,7 +147,7 @@
 
               if (err) {
                 errorNotification.style.display = 'block';
-                errorNotification.textContent = err;
+                errorNotification.textContent = formatError(err);
               } else {
                 errorNotification.style.display = 'none';
                 outputCodeMirror.setValue(yaml);
