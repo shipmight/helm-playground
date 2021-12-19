@@ -1,0 +1,27 @@
+name: Compile WASM
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  wasm:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: ‘1.15.0’
+      - run: make build
+      - run: |
+          rm .gitignore
+          git checkout site
+          git add dist/*
+          git commit -m "[GitHub action] WASM module"
+          git push origin site
