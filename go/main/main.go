@@ -1,4 +1,4 @@
-package wasm
+package main
 
 import (
 	"syscall/js"
@@ -9,12 +9,12 @@ import (
 func jsFuncWrapper() js.Func {
 	return js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		if len(args) != 2 {
-			return "Invalid no of arguments passed"
+			return `{"err":""}`
 		}
 		templateYaml := args[0].String()
 		valuesYaml := args[1].String()
-		returned := lib.GetYaml(templateYaml, valuesYaml)
-		return returned
+		returnValue := lib.GetYaml(templateYaml, valuesYaml)
+		return returnValue
 	})
 }
 

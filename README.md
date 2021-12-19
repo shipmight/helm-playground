@@ -21,6 +21,5 @@ make browser-test
 ## Locally develop in browser
 
 ```bash
-go install github.com/snwfdhmp/simplehttp
-simplehttp
+npx http-server -c-1
 ```

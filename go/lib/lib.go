@@ -2,6 +2,7 @@ package lib
 
 import (
 	"bytes"
+	"encoding/json"
 	"html/template"
 	"log"
 
@@ -16,14 +17,24 @@ type TemplateData struct {
 }
 
 type GetYamlReturnValue struct {
-	yaml string
-	err  string
+	Yaml string `json:"yaml"`
+	Err  error  `json:"err"`
 }
 
-func GetYaml(templateYaml string, valuesYaml string) GetYamlReturnValue {
+func toJson(returnValue GetYamlReturnValue) string {
+	bytes, err := json.Marshal(returnValue)
+	if err != nil {
+		return `{"err":"conversion to JSON failed"}`
+	}
+	return string(bytes)
+}
+
+func GetYaml(templateYaml string, valuesYaml string) string {
 	valuesData := ValuesObj{}
 	if err := yaml.Unmarshal([]byte(valuesYaml), &valuesData); err != nil {
-		return "", err
+		return toJson(GetYamlReturnValue{
+			Err: err,
+		})
 	}
 
 	asd := TemplateData{valuesData}
@@ -35,5 +46,7 @@ func GetYaml(templateYaml string, valuesYaml string) GetYamlReturnValue {
 		log.Println("executing template:", err)
 	}
 
-	return output.String(), nil
+	return toJson(GetYamlReturnValue{
+		Yaml: output.String(),
+	})
 }
