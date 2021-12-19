@@ -42,13 +42,41 @@
     <script src="codemirror/codemirror.js"></script>
     <script src="codemirror/yaml.js"></script>
     <script src="codemirror/placeholder.js"></script>
+    <script src="lz-string.js"></script>
     <script src="dist/wasm_exec.js"></script>
     <script src="lib.js"></script>
     <script>
-      const defaultTemplateYaml =
+      const compress = LZString.compressToEncodedURIComponent;
+      const decompress = LZString.decompressFromEncodedURIComponent;
+      const updateHash = (templateValue, valuesValue) => {
+        const hashParams = new URLSearchParams();
+        hashParams.append('t', compress(templateValue));
+        hashParams.append('v', compress(valuesValue));
+        const hash = hashParams.toString();
+        window.history.replaceState(null, '', `#${hash}`);
+      };
+      const readHash = () => {
+        const hashContent = window.location.hash.slice(1);
+        if (hashContent === '') {
+          return;
+        }
+        const params = new URLSearchParams(hashContent);
+        const templateValue = decompress(params.get('t'));
+        const valuesValue = decompress(params.get('v'));
+        return { templateValue, valuesValue };
+      };
+
+      let defaultTemplateYaml =
         '---\nexample: {{ .Values.items | toYaml | nindent 2 }}\n';
-      const defaultValuesYaml = '---\nitems: ["first", "second"]\n';
-      const defaultOutput = '---\nexample: \n  - first\n  - second\n';
+      let defaultValuesYaml = '---\nitems: ["first", "second"]\n';
+      let defaultOutput = '---\nexample: \n  - first\n  - second\n';
+
+      const fromHash = readHash();
+      if (fromHash) {
+        defaultTemplateYaml = fromHash.templateValue;
+        defaultValuesYaml = fromHash.valuesValue;
+        defaultOutput = '';
+      }
 
       const templateTextarea = document.querySelector('.textarea--template');
       const valuesTextarea = document.querySelector('.textarea--values');
@@ -118,10 +146,13 @@
                 errorNotification.style.display = 'none';
                 outputCodeMirror.setValue(yaml);
               }
+
+              updateHash(templateValue, valuesValue);
             };
 
             templateCodeMirror.on('change', onChange);
             valuesCodeMirror.on('change', onChange);
+            onChange();
           })
           .catch((error) => {
             console.error(error);
