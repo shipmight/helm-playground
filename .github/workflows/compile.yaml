@@ -18,9 +18,13 @@ jobs:
       - run: make build
       - name: Push commit to branch
         run: |
-          rm .gitignore
           git config --global user.name 'GitHub Action'
           git config --global user.email 'martti@marttilaine.com'
-          git add dist/*
-          git commit -m "[GitHub action] WASM module"
-          git push
+          rm .gitignore
+          git update-index --refresh
+          git diff-index --quiet HEAD -- || {
+            echo "There were changes. Committing.";
+            git add dist/*;
+            git commit -m "[GitHub action] WASM module";
+            git push
+          }
