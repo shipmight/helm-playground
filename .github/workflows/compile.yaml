@@ -14,6 +14,7 @@ jobs:
         with:
           go-version: '1.15'
       - run: go version
+      - run: make test
       - run: make build
       - name: Push commit to branch
         run: |
