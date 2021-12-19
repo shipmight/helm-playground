@@ -1,6 +1,6 @@
 
 test:
-	go test go/lib/lib.go go/lib/lib_test.go
+	go test go/lib/lib_test.go go/lib/lib.go go/lib/helm_engine.go
 
 build:
 	mkdir -p dist

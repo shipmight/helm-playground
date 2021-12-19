@@ -13,12 +13,32 @@ func TestGetYaml(t *testing.T) {
 		{
 			templateYaml:        "",
 			valuesYaml:          "",
-			expectedReturnValue: `{"yaml":"","err":null}`,
+			expectedReturnValue: `{"yaml":"","err":""}`,
 		},
 		{
 			templateYaml:        "name: {{ .Values.foobar }}",
 			valuesYaml:          "foobar: hello",
-			expectedReturnValue: `{"yaml":"name: hello","err":null}`,
+			expectedReturnValue: `{"yaml":"name: hello","err":""}`,
+		},
+		{
+			templateYaml:        "name: {{ .Values.foobar | default \"fallback\" }}",
+			valuesYaml:          "",
+			expectedReturnValue: `{"yaml":"name: fallback","err":""}`,
+		},
+		{
+			templateYaml:        "name: {{ .Values.foobar | toYaml }}",
+			valuesYaml:          "foobar: ['first', 'second']",
+			expectedReturnValue: `{"yaml":"name: - first\n- second","err":""}`,
+		},
+		{
+			templateYaml:        "name: {{ .Values. }}",
+			valuesYaml:          "",
+			expectedReturnValue: `{"yaml":"","err":"template: template:1: unexpected \u003c.\u003e in operand"}`,
+		},
+		{
+			templateYaml:        "\n\nname: {{ .Values. }}",
+			valuesYaml:          "",
+			expectedReturnValue: `{"yaml":"","err":"template: template:3: unexpected \u003c.\u003e in operand"}`,
 		},
 	}
 

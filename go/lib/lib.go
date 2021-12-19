@@ -3,10 +3,8 @@ package lib
 import (
 	"bytes"
 	"encoding/json"
-	"html/template"
-	"log"
+	"text/template"
 
-	"github.com/Masterminds/sprig"
 	"gopkg.in/yaml.v2"
 )
 
@@ -18,7 +16,7 @@ type TemplateData struct {
 
 type GetYamlReturnValue struct {
 	Yaml string `json:"yaml"`
-	Err  error  `json:"err"`
+	Err  string `json:"err"`
 }
 
 func toJson(returnValue GetYamlReturnValue) string {
@@ -33,17 +31,25 @@ func GetYaml(templateYaml string, valuesYaml string) string {
 	valuesData := ValuesObj{}
 	if err := yaml.Unmarshal([]byte(valuesYaml), &valuesData); err != nil {
 		return toJson(GetYamlReturnValue{
-			Err: err,
+			Err: err.Error(),
 		})
 	}
 
-	asd := TemplateData{valuesData}
+	templateData := TemplateData{valuesData}
 
 	var output bytes.Buffer
 
-	t := template.Must(template.New("template").Funcs(sprig.FuncMap()).Parse(templateYaml))
-	if err := t.Execute(&output, asd); err != nil {
-		log.Println("executing template:", err)
+	t, err := template.New("template").Funcs(funcMap()).Parse(templateYaml)
+	if err != nil {
+		return toJson(GetYamlReturnValue{
+			Err: err.Error(),
+		})
+	}
+
+	if err := t.Execute(&output, templateData); err != nil {
+		return toJson(GetYamlReturnValue{
+			Err: err.Error(),
+		})
 	}
 
 	return toJson(GetYamlReturnValue{
