@@ -11,14 +11,12 @@
 }
 
 :root {
-  --font-family-sans-serif: system-ui, -apple-system, 'Segoe UI', Roboto,
-    'Helvetica Neue', Arial, 'Noto Sans', 'Liberation Sans', sans-serif,
-    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  --font-family-sans-serif: system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --font-weight-semibold: 500;
 
   --z-index-above-codemirror: 10; /* codemirror elements have elevated z-index */
-
-  --app-bg: #ffffff;
 
   --top-bg: #475569;
   --top-color: #f8fafc;
@@ -39,12 +37,20 @@
   --error-bg: #fecaca;
   --error-color: #7f1d1d;
   --error-border: #dc2626;
+
+  --content-bg: #ffffff;
+  --content-color: #0f172a;
+
+  --pre-bg: #f1f5f9;
+  --pre-color: #1e293b;
+
+  --hr-color: #f1f5f9;
+
+  --ad-color: #94a3b8;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --app-bg: #334155;
-
     --top-bg: #1e293b;
     --top-color: #e2e8f0;
 
@@ -64,6 +70,16 @@
     --error-bg: #ef4444;
     --error-color: #fef2f2;
     --error-border: #ef4444;
+
+    --content-bg: #0f172a;
+    --content-color: #f1f5f9;
+
+    --pre-bg: #1e293b;
+    --pre-color: #f1f5f9;
+
+    --hr-color: #1e293b;
+
+    --ad-color: #94a3b8;
   }
 }
 
@@ -74,14 +90,16 @@ body {
 }
 
 .app {
+  flex-direction: column;
+}
+
+.app--playground {
   position: fixed;
   left: 0;
   top: 0;
   right: 0;
   bottom: 0;
   display: flex;
-  flex-direction: column;
-  background-color: var(--app-bg);
 }
 
 .top {
@@ -91,6 +109,10 @@ body {
   display: flex;
   align-items: center;
   padding: 0 16px;
+}
+
+.top__link {
+  margin-left: 16px;
 }
 
 .logo {
@@ -105,6 +127,47 @@ body {
   flex: 1;
   display: flex;
   overflow-y: scroll;
+  background-color: var(--content-bg);
+  color: var(--content-color);
+}
+
+.content--page {
+  padding: 16px 32px;
+  flex: none;
+  flex-direction: column;
+  overflow: auto;
+}
+
+.content--page > * {
+  margin: 8px 0;
+}
+
+.content--page h2 {
+  font-size: 24px;
+  font-weight: var(--font-weight-semibold);
+}
+
+.content--page pre {
+  font-family: monospace;
+  line-height: 1.6;
+  background-color: var(--pre-bg);
+  color: var(--pre-color);
+  padding: 8px 12px;
+}
+
+.content--page p a {
+  text-decoration: underline;
+}
+
+.content--page hr {
+  border-top: 1px solid var(--hr-color);
+  margin: 16px 0;
+}
+
+.ad {
+  color: var(--ad-color);
+  font-size: 12px;
+  margin: 16px 0;
 }
 
 .column {
@@ -130,6 +193,7 @@ body {
   flex: 1;
   padding: 8px;
   font-size: 13px;
+  line-height: 1.4;
 }
 
 .CodeMirror-placeholder.CodeMirror-placeholder.CodeMirror-placeholder {
