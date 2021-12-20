@@ -50,94 +50,98 @@
       const decompress = LZString.decompressFromEncodedURIComponent;
       const updateHash = (templateValue, valuesValue) => {
         const hashParams = new URLSearchParams();
-        hashParams.append('t', compress(templateValue));
-        hashParams.append('v', compress(valuesValue));
+        hashParams.append("t", compress(templateValue));
+        hashParams.append("v", compress(valuesValue));
         const hash = hashParams.toString();
-        window.history.replaceState(null, '', `#${hash}`);
+        window.history.replaceState(null, "", `#${hash}`);
       };
       const readHash = () => {
         const hashContent = window.location.hash.slice(1);
-        if (hashContent === '') {
+        if (hashContent === "") {
           return;
         }
         const params = new URLSearchParams(hashContent);
-        const templateValue = decompress(params.get('t'));
-        const valuesValue = decompress(params.get('v'));
+        const templateValue = decompress(params.get("t"));
+        const valuesValue = decompress(params.get("v"));
         return { templateValue, valuesValue };
       };
 
       let defaultTemplateYaml =
-        '---\nexample: {{ .Values.items | toYaml | nindent 2 }}\n';
+        "---\nexample: {{ .Values.items | toYaml | nindent 2 }}\n";
       let defaultValuesYaml = '---\nitems: ["first", "second"]\n';
-      let defaultOutput = '---\nexample: \n  - first\n  - second\n';
+      let defaultOutput = "---\nexample: \n  - first\n  - second\n";
 
       const fromHash = readHash();
       if (fromHash) {
         defaultTemplateYaml = fromHash.templateValue;
         defaultValuesYaml = fromHash.valuesValue;
-        defaultOutput = '';
+        defaultOutput = "";
       }
 
-      const templateTextarea = document.querySelector('.textarea--template');
-      const valuesTextarea = document.querySelector('.textarea--values');
-      const outputTextarea = document.querySelector('.textarea--output');
+      const templateTextarea = document.querySelector(".textarea--template");
+      const valuesTextarea = document.querySelector(".textarea--values");
+      const outputTextarea = document.querySelector(".textarea--output");
 
       templateTextarea.value = defaultTemplateYaml;
       valuesTextarea.value = defaultValuesYaml;
       outputTextarea.value = defaultOutput;
 
-      const lightTheme = 'elegant';
-      const darkTheme = 'material';
+      const lightTheme = "elegant";
+      const darkTheme = "material";
 
       const isDark =
         window.matchMedia &&
-        window.matchMedia('(prefers-color-scheme: dark)').matches;
+        window.matchMedia("(prefers-color-scheme: dark)").matches;
 
       const codeMirrorOptions = {
-        mode: 'yaml',
+        mode: "yaml",
         theme: isDark ? darkTheme : lightTheme,
       };
 
       const templateCodeMirror = CodeMirror.fromTextArea(templateTextarea, {
         ...codeMirrorOptions,
-        placeholder: 'Copy your Helm template here',
+        placeholder: "Copy your Helm template here",
       });
       const valuesCodeMirror = CodeMirror.fromTextArea(valuesTextarea, {
         ...codeMirrorOptions,
-        placeholder: 'Copy your values YAML here',
+        placeholder: "Copy your values YAML here",
       });
       const outputCodeMirror = CodeMirror.fromTextArea(outputTextarea, {
         ...codeMirrorOptions,
-        placeholder: 'Generated output will show up here',
+        placeholder: "Generated output will show up here",
       });
 
+      templateTextarea.CodeMirror = templateCodeMirror;
+      valuesTextarea.CodeMirror = valuesCodeMirror;
+      outputTextarea.CodeMirror = outputCodeMirror;
+
       window
-        .matchMedia('(prefers-color-scheme: dark)')
-        .addEventListener('change', (event) => {
+        .matchMedia("(prefers-color-scheme: dark)")
+        .addEventListener("change", (event) => {
           const theme = event.matches ? darkTheme : lightTheme;
-          templateCodeMirror.setOption('theme', theme);
-          valuesCodeMirror.setOption('theme', theme);
-          outputCodeMirror.setOption('theme', theme);
+          templateCodeMirror.setOption("theme", theme);
+          valuesCodeMirror.setOption("theme", theme);
+          outputCodeMirror.setOption("theme", theme);
         });
 
-      const overlay = document.querySelector('.overlay');
-      const startButton = document.querySelector('.start');
-      const errorNotification = document.querySelector('.error');
+      const overlay = document.querySelector(".overlay");
+      const startButton = document.querySelector(".start");
+      const errorNotification = document.querySelector(".error");
 
       const formatError = (err) => {
-        err = err.replace('template: ', 'template.yaml - ');
-        err = err.replace('yaml: ', 'values.yaml - ');
+        err = err.replace("template: ", "template.yaml - ");
+        err = err.replace("yaml: ", "values.yaml - ");
         return err;
       };
 
-      startButton.addEventListener('click', () => {
+      startButton.addEventListener("click", () => {
         startButton.disabled = true;
-        startButton.textContent = 'Loading…';
+        startButton.textContent = "Loading…";
 
         window
           .loadGetYaml()
           .then((getYaml) => {
-            overlay.style.display = 'none';
+            overlay.style.display = "none";
 
             const onChange = () => {
               const templateValue = templateCodeMirror.getValue();
@@ -146,18 +150,18 @@
               const { yaml, err } = getYaml(templateValue, valuesValue);
 
               if (err) {
-                errorNotification.style.display = 'block';
+                errorNotification.style.display = "block";
                 errorNotification.textContent = formatError(err);
               } else {
-                errorNotification.style.display = 'none';
+                errorNotification.style.display = "none";
                 outputCodeMirror.setValue(yaml);
               }
 
               updateHash(templateValue, valuesValue);
             };
 
-            templateCodeMirror.on('change', onChange);
-            valuesCodeMirror.on('change', onChange);
+            templateCodeMirror.on("change", onChange);
+            valuesCodeMirror.on("change", onChange);
             onChange();
           })
           .catch((error) => {
