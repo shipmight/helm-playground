@@ -3,7 +3,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Helm Playground</title>
+    <title>Helm Playground | Debug Helm templates in your browser</title>
+    <meta
+      name="description"
+      content="Live preview Helm charts in your browser."
+    />
     <link rel="stylesheet" href="codemirror/codemirror.css" />
     <link rel="stylesheet" href="codemirror/elegant.css" />
     <link rel="stylesheet" href="codemirror/material.css" />
@@ -29,7 +33,7 @@
         </div>
         <div class="overlay">
           <p><button class="start">Start playground</button></p>
-          <p><strong>Debug Helm-templates in your browser</strong></p>
+          <p><strong>Debug Helm templates in your browser</strong></p>
           <p class="overlay__dim">
             A WebAssembly-file (2.3MB gzipped) will be downloaded and cached by
             your browser. It includes Sprig, which Helm uses for templating.
@@ -170,5 +174,10 @@
           });
       });
     </script>
+    <script
+      src="https://cdn.usefathom.com/script.js"
+      data-site="ZNCHLJMX"
+      defer
+    ></script>
   </body>
 </html>
