@@ -1,7 +1,5 @@
-package lib
-
 // Source:
-// https://github.com/helm/helm/blob/a499b4b179307c267bdf3ec49b880e3dbd2a5591/pkg/engine/funcs.go#L52
+// https://github.com/helm/helm/blob/a499b4b179307c267bdf3ec49b880e3dbd2a5591/pkg/engine/funcs.go
 //
 // Modifications:
 // - change package name from "engine" to "lib" which is used in this package
@@ -21,6 +19,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+
+package lib
 
 import (
 	"bytes"

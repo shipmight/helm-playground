@@ -15,13 +15,19 @@ The WASM module is compiled in a GitHub action. You can find the workflow in [`.
 
 ## Development
 
-### Test the golang code
+### Pull the repository
+
+```bash
+git clone git@github.com:codeclown/helm-playground.git
+```
+
+### Run tests for the golang code
 
 ```bash
 make test
 ```
 
-### Build
+### Build WASM from golang
 
 ```bash
 make build
@@ -30,11 +36,20 @@ make build
 ### Test the built WASM code in browser
 
 ```bash
+yarn --cwd ./browser-test # Install puppeteer in the subfolder
 make browser-test
 ```
 
 ### Locally develop in browser
 
+You need a HTTP server to run the site locally, because fetch doesn't work under `file://` protocol.
+
 ```bash
 npx http-server -c-1
 ```
+
+## License
+
+Some files in this repository contain embedded license notes.
+
+Other files in this repository are licensed under GNU AGPLv3 (see [LICENSE](./LICENSE)).
