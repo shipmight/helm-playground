@@ -14,6 +14,9 @@
   --font-family-sans-serif: system-ui, -apple-system, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-family-monospace: Menlo, Consolas, Monaco, Liberation Mono,
+    Lucida Console, monospace;
+
   --font-weight-semibold: 500;
 
   --z-index-above-codemirror: 10; /* codemirror elements have elevated z-index */
@@ -39,7 +42,7 @@
   --error-border: #ef4444;
 
   --content-bg: #0f172a;
-  --content-color: #f1f5f9;
+  --content-color: #e2e8f0;
 
   --pre-bg: #1e293b;
   --pre-color: #f1f5f9;
@@ -111,14 +114,16 @@ body {
 .content--page h2 {
   font-size: 24px;
   font-weight: var(--font-weight-semibold);
+  margin-top: 24px;
 }
 
 .content--page pre {
-  font-family: monospace;
+  font-family: var(--font-family-monospace);
   line-height: 1.6;
   background-color: var(--pre-bg);
   color: var(--pre-color);
   padding: 8px 12px;
+  overflow-x: auto;
 }
 
 .content--page p a {
@@ -160,6 +165,12 @@ body {
   padding: 8px;
   font-size: 13px;
   line-height: 1.4;
+}
+
+.CodeMirror.CodeMirror {
+  background-color: var(--pre-bg);
+  font-family: var(--font-family-monospace);
+  font-size: 12px;
 }
 
 .CodeMirror-placeholder.CodeMirror-placeholder.CodeMirror-placeholder {
