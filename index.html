@@ -9,7 +9,6 @@
       content="Live preview Helm charts in your browser."
     />
     <link rel="stylesheet" href="codemirror/codemirror.css" />
-    <link rel="stylesheet" href="codemirror/elegant.css" />
     <link rel="stylesheet" href="codemirror/material.css" />
     <link rel="stylesheet" href="style.css" />
     <link rel="icon" type="image/png" href="favicon.png" />
@@ -93,16 +92,9 @@
       valuesTextarea.value = defaultValuesYaml;
       outputTextarea.value = defaultOutput;
 
-      const lightTheme = "elegant";
-      const darkTheme = "material";
-
-      const isDark =
-        window.matchMedia &&
-        window.matchMedia("(prefers-color-scheme: dark)").matches;
-
       const codeMirrorOptions = {
         mode: "yaml",
-        theme: isDark ? darkTheme : lightTheme,
+        theme: "material",
       };
 
       const templateCodeMirror = CodeMirror.fromTextArea(templateTextarea, {
@@ -121,15 +113,6 @@
       templateTextarea.CodeMirror = templateCodeMirror;
       valuesTextarea.CodeMirror = valuesCodeMirror;
       outputTextarea.CodeMirror = outputCodeMirror;
-
-      window
-        .matchMedia("(prefers-color-scheme: dark)")
-        .addEventListener("change", (event) => {
-          const theme = event.matches ? darkTheme : lightTheme;
-          templateCodeMirror.setOption("theme", theme);
-          valuesCodeMirror.setOption("theme", theme);
-          outputCodeMirror.setOption("theme", theme);
-        });
 
       const overlay = document.querySelector(".overlay");
       const startButton = document.querySelector(".start");
