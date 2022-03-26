@@ -21,7 +21,7 @@
 
   --z-index-above-codemirror: 10; /* codemirror elements have elevated z-index */
 
-  --top-bg: #1e293b;
+  --top-bg: #0f172a;
   --top-color: #e2e8f0;
 
   --label-bg: #475569;
@@ -41,10 +41,10 @@
   --error-color: #fef2f2;
   --error-border: #ef4444;
 
-  --content-bg: #0f172a;
+  --content-bg: #1e293b;
   --content-color: #e2e8f0;
 
-  --pre-bg: #1e293b;
+  --pre-bg: #0f172a;
   --pre-color: #f1f5f9;
 
   --hr-color: #1e293b;
