@@ -47,6 +47,12 @@ func GetYaml(templateYaml string, valuesYaml string) string {
 		return val, nil
 	}
 
+	// If the template contains `fail`, we don't want to return an error which
+	// would prevent previewing the entire template. Return an empty string.
+	funcMap["fail"] = func(val interface{}) (interface{}, error) {
+		return "", nil
+	}
+
 	t, err := template.New("template").Funcs(funcMap).Parse(templateYaml)
 	if err != nil {
 		return toJson(GetYamlReturnValue{

@@ -51,6 +51,11 @@ func TestGetYaml(t *testing.T) {
 			valuesYaml:          "",
 			expectedReturnValue: `{"yaml":"name: \u003cno value\u003e","err":""}`,
 		},
+		{
+			templateYaml:        "{{ fail \"reason\" }}",
+			valuesYaml:          "",
+			expectedReturnValue: `{"yaml":"","err":""}`,
+		},
 
 		// Template formatting error
 		{
