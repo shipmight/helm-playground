@@ -1,6 +1,8 @@
-# helm-playground
+# Helm Playground
 
 This repository contains the source code for https://helm-playground.com
+
+[![Screenshot of Helm Playground – Click to open](screenshot.png)](https://helm-playground.com)
 
 ## How it works
 
