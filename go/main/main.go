@@ -3,7 +3,7 @@ package main
 import (
 	"syscall/js"
 
-	"github.com/codeclown/helm-playground/go/lib"
+	"github.com/shipmight/helm-playground/go/lib"
 )
 
 func jsFuncWrapper() js.Func {

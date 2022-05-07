@@ -1,4 +1,4 @@
-module github.com/codeclown/helm-playground
+module github.com/shipmight/helm-playground
 
 go 1.15
 

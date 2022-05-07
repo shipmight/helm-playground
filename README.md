@@ -18,7 +18,7 @@ The Wasm module is compiled in a GitHub action. You can find the workflow in [`.
 ### Pull the repository
 
 ```bash
-git clone git@github.com:codeclown/helm-playground.git
+git clone git@github.com:shipmight/helm-playground.git
 ```
 
 ### Run tests for the golang code
