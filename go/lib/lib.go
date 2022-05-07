@@ -39,7 +39,15 @@ func GetYaml(templateYaml string, valuesYaml string) string {
 
 	var output bytes.Buffer
 
-	t, err := template.New("template").Funcs(funcMap()).Parse(templateYaml)
+	funcMap := funcMap()
+
+	// If the template contains `required`, we don't want to return an error which
+	// would prevent previewing the entire template. Simply pass the value through.
+	funcMap["required"] = func(val interface{}) (interface{}, error) {
+		return val, nil
+	}
+
+	t, err := template.New("template").Funcs(funcMap).Parse(templateYaml)
 	if err != nil {
 		return toJson(GetYamlReturnValue{
 			Err: err.Error(),

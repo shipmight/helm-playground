@@ -22,6 +22,11 @@ func TestGetYaml(t *testing.T) {
 			valuesYaml:          "foobar: hello",
 			expectedReturnValue: `{"yaml":"name: hello","err":""}`,
 		},
+		{
+			templateYaml:        "name: {{ .Values.foobar }}",
+			valuesYaml:          "",
+			expectedReturnValue: `{"yaml":"name: \u003cno value\u003e","err":""}`,
+		},
 
 		// Template functions
 		{
@@ -40,6 +45,11 @@ func TestGetYaml(t *testing.T) {
 			templateYaml:        "name: {{ .Values.foobar | toYaml | nindent 2 }}",
 			valuesYaml:          "foobar:\n  first: 1\n  second: 2",
 			expectedReturnValue: `{"yaml":"name: \n  first: 1\n  second: 2","err":""}`,
+		},
+		{
+			templateYaml:        "name: {{ .Values.foobar | required }}",
+			valuesYaml:          "",
+			expectedReturnValue: `{"yaml":"name: \u003cno value\u003e","err":""}`,
 		},
 
 		// Template formatting error
