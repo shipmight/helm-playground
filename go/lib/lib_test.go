@@ -56,6 +56,26 @@ func TestGetYaml(t *testing.T) {
 			valuesYaml:          "",
 			expectedReturnValue: `{"yaml":"","err":""}`,
 		},
+		{
+			templateYaml: `
+				{{- define "foobar.name" -}}
+					{{- . | trunc 5 -}}
+				{{- end -}}
+				fromTemplate: {{ include "foobar.name" .Values.name -}}
+			`,
+			valuesYaml:          "name: '123456789'",
+			expectedReturnValue: `{"yaml":"fromTemplate: 12345","err":""}`,
+		},
+		{
+			templateYaml: `
+				{{- define "foobar.name" -}}
+				  {{- include "foobar.name" . -}}
+				{{- end -}}
+				fromTemplate: {{ include "foobar.name" .Values.name -}}
+			`,
+			valuesYaml:          "name: '123456789'",
+			expectedReturnValue: `{"yaml":"","err":"template: template:5:21: executing \"template\" at \u003cinclude \"foobar.name\" .Values.name\u003e: error calling include: template: template:3:10: executing \"foobar.name\" at \u003cinclude \"foobar.name\" .\u003e: error calling include: template: template:3:10: executing \"foobar.name\" at \u003cinclude \"foobar.name\" .\u003e: error calling include: template: template:3:10: executing \"foobar.name\" at \u003cinclude \"foobar.name\" .\u003e: error calling include: template: template:3:10: executing \"foobar.name\" at \u003cinclude \"foobar.name\" .\u003e: error calling include: template: template:3:10: executing \"foobar.name\" at \u003cinclude \"foobar.name\" .\u003e: error calling include: template: template:3:10: executing \"foobar.name\" at \u003cinclude \"foobar.name\" .\u003e: error calling include: rendering template has a nested reference name: foobar.name"}`,
+		},
 
 		// Template formatting error
 		{
