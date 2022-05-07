@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"text/template"
 
-	"gopkg.in/yaml.v2"
+	"sigs.k8s.io/yaml"
 )
 
 type ValuesObj map[string]interface{}

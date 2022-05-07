@@ -36,6 +36,11 @@ func TestGetYaml(t *testing.T) {
 			valuesYaml:          "foobar: ['first', 'second']",
 			expectedReturnValue: `{"yaml":"name: - first\n- second","err":""}`,
 		},
+		{
+			templateYaml:        "name: {{ .Values.foobar | toYaml | nindent 2 }}",
+			valuesYaml:          "foobar:\n  first: 1\n  second: 2",
+			expectedReturnValue: `{"yaml":"name: \n  first: 1\n  second: 2","err":""}`,
+		},
 
 		// Template formatting error
 		{
