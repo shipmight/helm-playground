@@ -24,7 +24,7 @@ jobs:
           git config --global user.name 'GitHub Action'
           git config --global user.email 'bot'
           rm .gitignore
-          git diff --stat | grep dist --invert-match --quiet || {
+          git diff --stat | grep dist/ --quiet && {
             echo "There were changes. Committing.";
             git add dist/*;
             git commit -m "[GitHub action] Wasm module";
