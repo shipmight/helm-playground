@@ -10,10 +10,39 @@ import (
 	"sigs.k8s.io/yaml"
 )
 
+type ReleaseObj struct {
+	Name      string
+	Namespace string
+	IsUpgrade bool
+	IsInstall bool
+	Revision  int
+	Service   string
+}
+
+type ChartObj struct {
+	ApiVersion   string
+	Name         string
+	Version      string
+	KubeVersion  string
+	Description  string
+	Type         string
+	Keywords     []string
+	Home         string
+	Sources      []string
+	Dependencies []interface{}
+	Maintainers  []interface{}
+	Icon         string
+	AppVersion   string
+	Deprecated   bool
+	Annotations  map[string]interface{}
+}
+
 type ValuesObj map[string]interface{}
 
 type TemplateData struct {
-	Values ValuesObj
+	Release ReleaseObj
+	Chart   ChartObj
+	Values  ValuesObj
 }
 
 type GetYamlReturnValue struct {
@@ -37,7 +66,38 @@ func GetYaml(templateYaml string, valuesYaml string) string {
 		})
 	}
 
-	templateData := TemplateData{valuesData}
+	releaseData := ReleaseObj{
+		Name:      "example",
+		Namespace: "example",
+		IsUpgrade: false,
+		IsInstall: false,
+		Revision:  1,
+		Service:   "Helm",
+	}
+
+	chartData := ChartObj{
+		ApiVersion:   "v2",
+		Name:         "example",
+		Version:      "0.1.0",
+		KubeVersion:  "",
+		Description:  "example",
+		Type:         "application",
+		Keywords:     make([]string, 0),
+		Home:         "",
+		Sources:      make([]string, 0),
+		Dependencies: make([]interface{}, 0),
+		Maintainers:  make([]interface{}, 0),
+		Icon:         "",
+		AppVersion:   "",
+		Deprecated:   false,
+		Annotations:  make(map[string]interface{}),
+	}
+
+	templateData := TemplateData{
+		Release: releaseData,
+		Chart:   chartData,
+		Values:  valuesData,
+	}
 
 	t := template.New("template")
 

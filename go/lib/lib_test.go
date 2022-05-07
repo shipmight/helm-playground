@@ -28,6 +28,18 @@ func TestGetYaml(t *testing.T) {
 			expectedReturnValue: `{"yaml":"name: \u003cno value\u003e","err":""}`,
 		},
 
+		// Built-in objects
+		{
+			templateYaml:        "name: {{ .Release | toYaml }}",
+			valuesYaml:          "",
+			expectedReturnValue: `{"yaml":"name: IsInstall: false\nIsUpgrade: false\nName: example\nNamespace: example\nRevision: 1\nService: Helm","err":""}`,
+		},
+		{
+			templateYaml:        "name: {{ .Chart | toYaml }}",
+			valuesYaml:          "",
+			expectedReturnValue: `{"yaml":"name: Annotations: {}\nApiVersion: v2\nAppVersion: \"\"\nDependencies: []\nDeprecated: false\nDescription: example\nHome: \"\"\nIcon: \"\"\nKeywords: []\nKubeVersion: \"\"\nMaintainers: []\nName: example\nSources: []\nType: application\nVersion: 0.1.0","err":""}`,
+		},
+
 		// Template functions
 		{
 			templateYaml:        "name: {{ .Values.foobar | default \"fallback\" }}",
