@@ -173,6 +173,11 @@ body {
   font-size: 12px;
 }
 
+.CodeMirror-vscrollbar::-webkit-scrollbar,
+.CodeMirror-hscrollbar::-webkit-scrollbar {
+  background-color: transparent;
+}
+
 .CodeMirror-placeholder.CodeMirror-placeholder.CodeMirror-placeholder {
   color: var(--placeholder-color);
 }
