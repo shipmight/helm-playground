@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"strings"
 	"text/template"
 
@@ -46,8 +47,9 @@ type TemplateData struct {
 }
 
 type GetYamlReturnValue struct {
-	Yaml string `json:"yaml"`
-	Err  string `json:"err"`
+	Yaml    string `json:"yaml"`
+	Err     string `json:"err"`
+	Warning string `json:"warning"`
 }
 
 func toJson(returnValue GetYamlReturnValue) string {
@@ -153,7 +155,18 @@ func GetYaml(templateYaml string, valuesYaml string) string {
 		})
 	}
 
+	outputYaml := output.String()
+
+	lintValues := ValuesObj{}
+	if err := yaml.Unmarshal([]byte(outputYaml), &lintValues); err != nil {
+		fmt.Printf("%e", err)
+		return toJson(GetYamlReturnValue{
+			Warning: err.Error(),
+			Yaml:    outputYaml,
+		})
+	}
+
 	return toJson(GetYamlReturnValue{
-		Yaml: output.String(),
+		Yaml: outputYaml,
 	})
 }

@@ -56,7 +56,8 @@
             <a href="https://github.com/shipmight/helm-playground">GitHub</a>.
           </p>
         </div>
-        <div class="error" style="display: none"></div>
+        <div class="floating-error" style="display: none"></div>
+        <div class="floating-warning" style="display: none"></div>
       </div>
     </div>
     <script src="codemirror/codemirror.js"></script>
@@ -130,7 +131,8 @@
 
       const overlay = document.querySelector(".overlay");
       const startButton = document.querySelector(".start");
-      const errorNotification = document.querySelector(".error");
+      const errorNotification = document.querySelector(".floating-error");
+      const warningNotification = document.querySelector(".floating-warning");
 
       const formatError = (err) => {
         err = err.replace("template: ", "template.yaml - ");
@@ -169,12 +171,18 @@
               const templateValue = templateCodeMirror.getValue();
               const valuesValue = valuesCodeMirror.getValue();
 
-              const { yaml, err } = getYaml(templateValue, valuesValue);
+              const { yaml, err, warning } = getYaml(
+                templateValue,
+                valuesValue
+              );
 
               for (const marker of markers.values()) {
                 marker.clear();
                 markers.delete(marker);
               }
+
+              errorNotification.style.display = "none";
+              warningNotification.style.display = "none";
 
               if (err) {
                 const templateError = parseTemplateError(err);
@@ -197,8 +205,12 @@
                 errorNotification.style.display = "block";
                 errorNotification.textContent = formatError(err);
               } else {
-                errorNotification.style.display = "none";
                 outputCodeMirror.setValue(yaml);
+
+                if (warning) {
+                  warningNotification.style.display = "block";
+                  warningNotification.textContent = `Warning, the generated YAML may contain parsing errors. Converting it to JSON failed: ${warning}`;
+                }
               }
 
               updateHash(templateValue, valuesValue);
