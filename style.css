@@ -41,6 +41,10 @@
   --error-color: #fef2f2;
   --error-border: #ef4444;
 
+  --warning-bg: #ca8a04;
+  --warning-color: #fefce8;
+  --warning-border: #ca8a04;
+
   --content-bg: #1e293b;
   --content-color: #e2e8f0;
 
@@ -229,7 +233,7 @@ body {
   opacity: 0.5;
 }
 
-.error {
+.floating-error {
   position: absolute;
   left: 16px;
   right: 16px;
@@ -239,6 +243,24 @@ body {
   color: var(--error-color);
   border-left: 2px solid var(--error-border);
   z-index: var(--z-index-above-codemirror);
+}
+
+.floating-warning {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 16px;
+  padding: 16px;
+  background-color: var(--warning-bg);
+  color: var(--warning-color);
+  border-left: 2px solid var(--warning-border);
+  z-index: var(--z-index-above-codemirror);
+}
+
+.marker-error.marker-error {
+  background-color: var(--error-bg);
+  color: var(--error-color);
+  box-shadow: 0 2px 0 0 var(--error-border);
 }
 
 @media all and (max-width: 799px) {
