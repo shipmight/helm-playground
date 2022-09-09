@@ -119,6 +119,25 @@
         mode: "yaml",
         theme: "material",
         showInvisibles: true,
+
+        // Source: https://github.com/codemirror/codemirror5/issues/988#issuecomment-549644684
+        tabSize: 2,
+        indentWithTabs: false,
+        smartIndent: true,
+        extraKeys: {
+          Tab: (cm) => {
+            if (cm.getMode().name === "null") {
+              cm.execCommand("insertTab");
+            } else {
+              if (cm.somethingSelected()) {
+                cm.execCommand("indentMore");
+              } else {
+                cm.execCommand("insertSoftTab");
+              }
+            }
+          },
+          "Shift-Tab": (cm) => cm.execCommand("indentLess"),
+        },
       };
 
       const templateCodeMirror = CodeMirror.fromTextArea(templateTextarea, {
