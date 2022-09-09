@@ -7,13 +7,13 @@ const serverHost = "127.0.0.1";
 const serverPort = 8123;
 const serverUrl = `http://${serverHost}:${serverPort}`;
 
-const initialOutput = "---\nexample: \n  - first\n  - second\n";
+const initialOutput = "---\nexample:\n  - first\n  - second\n";
 const initialHash =
-  "t=LQhQFMA8EMFsAcA24BcACA3htA6AatIgK7gDOOAlgC7iyloA%2BaVA9gJpyKNoB2FPAE3A8qaAExoAvpNBA&v=LQhQEsBcFMFsGcBcACA2gIgGbgE70ugDTLrzQDGA9gHYAm6AuqEA";
+  "t=LQhQFMA8EMFsAcA24BcACA3h4aB0A1aRAV3AGdcBLAF3FjLQB81qB7ATTkSbQDtLeAE3C9qaAExoAvlNBA&v=LQhQEsBcFMFsGcBcACA2gIgGbgE70ugDTLrzQDGA9gHYAm6AuqEA";
 const changeValuesContentTo = 'items: ["hello", "from", "puppeteer"]';
-const expectedOutput = "---\nexample: \n  - hello\n  - from\n  - puppeteer\n";
+const expectedOutput = "---\nexample:\n  - hello\n  - from\n  - puppeteer\n";
 const expectedHash =
-  "t=LQhQFMA8EMFsAcA24BcACA3htA6AatIgK7gDOOAlgC7iyloA%2BaVA9gJpyKNoB2FPAE3A8qaAExoAvpNBA&v=JYFwpgtgzgXABAbQEQAswBt0HskBo5IBmATlhHgQA4CullY4YxSAukA";
+  "t=LQhQFMA8EMFsAcA24BcACA3h4aB0A1aRAV3AGdcBLAF3FjLQB81qB7ATTkSbQDtLeAE3C9qaAExoAvlNBA&v=JYFwpgtgzgXABAbQEQAswBt0HskBo5IBmATlhHgQA4CullY4YxSAukA";
 
 async function run() {
   console.error("[browser-test] starting server");
