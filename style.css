@@ -23,6 +23,7 @@
 
   --top-bg: #0f172a;
   --top-color: #e2e8f0;
+  --top-bright: #f8fafc;
 
   --label-bg: #475569;
   --label-color: #f1f5f9;
@@ -86,6 +87,10 @@ body {
 
 .top__link {
   margin-left: 24px;
+}
+
+.top__link:hover {
+  color: var(--top-bright);
 }
 
 .logo {
@@ -276,5 +281,9 @@ body {
   .textarea,
   .CodeMirror {
     max-height: 300px;
+  }
+
+  .hide-on-mobile {
+    display: none;
   }
 }
