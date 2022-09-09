@@ -70,6 +70,7 @@
     <script src="codemirror/codemirror.js"></script>
     <script src="codemirror/yaml.js"></script>
     <script src="codemirror/placeholder.js"></script>
+    <script src="codemirror/cm-show-invisibles.js"></script>
     <script src="lz-string.js"></script>
     <script src="dist/wasm_exec.js"></script>
     <script src="lib.js"></script>
@@ -95,7 +96,7 @@
       };
 
       let defaultTemplateYaml =
-        "---\nexample: {{ .Values.items | toYaml | nindent 2 }}\n";
+        "---\nexample: {{- .Values.items | toYaml | nindent 2 }}\n";
       let defaultValuesYaml = '---\nitems: ["first", "second"]\n';
       let defaultOutput = "---\nexample: \n  - first\n  - second\n";
 
@@ -117,6 +118,7 @@
       const codeMirrorOptions = {
         mode: "yaml",
         theme: "material",
+        showInvisibles: true,
       };
 
       const templateCodeMirror = CodeMirror.fromTextArea(templateTextarea, {
