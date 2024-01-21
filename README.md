@@ -35,6 +35,8 @@ make test
 make build
 ```
 
+Note: do not commit changes in `dist/`. GitHub Actions builds and commits after your commit is merged.
+
 ### Test the built Wasm code in browser
 
 ```bash
