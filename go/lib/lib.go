@@ -130,7 +130,7 @@ func GetYaml(templateYaml string, valuesYaml string) string {
 
 	// If the template contains `required`, we don't want to return an error which
 	// would prevent previewing the entire template. Simply pass the value through.
-	funcMap["required"] = func(val interface{}) (interface{}, error) {
+	funcMap["required"] = func(warn string, val interface{}) (interface{}, error) {
 		return val, nil
 	}
 

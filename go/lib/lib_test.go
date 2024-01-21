@@ -54,7 +54,7 @@ func TestGetYaml(t *testing.T) {
 			expectedReturnValue: `{"yaml":"name: \n  first: 1\n  second: 2","err":"","warning":""}`,
 		},
 		{
-			templateYaml:        "name: {{ .Values.foobar | required }}",
+			templateYaml:        "name: {{ .Values.foobar | required \".foobar must be set\" }}",
 			valuesYaml:          "",
 			expectedReturnValue: `{"yaml":"name: \u003cno value\u003e","err":"","warning":""}`,
 		},
