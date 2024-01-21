@@ -50,6 +50,12 @@ You need a HTTP server to run the site locally, because fetch doesn't work under
 npx http-server -c-1
 ```
 
+### Updating dependencies
+
+Dependency versions in `go.mod` should mirror a recent Helm release.
+
+See the top comment in [`go.mod`](go.mod) for the current mirrored Helm version and upgrade instructions.
+
 ## License
 
 Some files in this repository contain embedded license notes.
