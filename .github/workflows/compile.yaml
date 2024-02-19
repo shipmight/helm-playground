@@ -26,7 +26,7 @@ jobs:
           rm .gitignore
           if git diff --stat | grep dist/ --quiet; then
             echo "There were changes. Committing.";
-            git add dist/*;
+            git add app/dist/*;
             git commit -m "[GitHub action] Wasm module";
             git push
           else
