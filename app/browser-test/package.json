@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "http-server": "^14.0.0",
+    "puppeteer": "^13.0.0"
+  }
+}

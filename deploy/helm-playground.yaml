@@ -1,0 +1,47 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: helm-playground
+  labels:
+    app: helm-playground
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: helm-playground
+  namespace: helm-playground
+  labels:
+    app: helm-playground
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: helm-playground
+  template:
+    metadata:
+      labels:
+        app: helm-playground
+    spec:
+      containers:
+        - name: helm-playground
+          image: helm-playground
+          ports:
+            - containerPort: 5000
+          readinessProbe:
+            httpGet:
+              port: 5000
+              path: '/'
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: helm-playground
+  namespace: helm-playground
+spec:
+  selector:
+    app: helm-playground
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5000
