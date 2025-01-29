@@ -13,7 +13,7 @@ func jsFuncWrapper() js.Func {
 		}
 		templateYaml := args[0].String()
 		valuesYaml := args[1].String()
-		returnValue := lib.GetYaml(templateYaml, valuesYaml)
+		returnValue := lib.GetYaml(templateYaml, valuesYaml, lib.GetYamlConfig{MaxTplRuns: 100})
 		return returnValue
 	})
 }
