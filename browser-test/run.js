@@ -32,7 +32,9 @@ async function run() {
   console.error(`[browser-test] server started at ${serverUrl}`);
 
   console.error("[browser-test] starting browser");
-  const browser = await puppeteer.launch();
+  const browser = await puppeteer.launch({
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+  });
   const page = await browser.newPage();
   await page.goto(serverUrl);
   console.error("[browser-test] started browser");
