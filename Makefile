@@ -1,6 +1,9 @@
 
 .PHONY: browser-test
 
+formatcheck:
+	[ -z "$(shell gofmt -l go/**/*.go)" ] || echo "The following files need to be formatted with 'gofmt -w go/**/*.go': $(shell gofmt -l go/**/*.go)" && exit 1
+
 test:
 	go test go/lib/lib_test.go go/lib/lib.go go/lib/helm_engine.go
 

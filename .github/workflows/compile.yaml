@@ -17,6 +17,7 @@ jobs:
         with:
           node-version: "16"
       - run: go version
+      - run: make formatcheck
       - run: make test
       - run: yarn --cwd ./browser-test && make browser-test
       - run: make build

@@ -23,6 +23,14 @@ The Wasm module is compiled in a GitHub action. You can find the workflow in [`.
 git clone git@github.com:shipmight/helm-playground.git
 ```
 
+### Run formatcheck for the golang code
+
+```bash
+make formatcheck
+```
+
+You can autoformat all files with `gofmt -w go/**/*.go`.
+
 ### Run tests for the golang code
 
 ```bash
