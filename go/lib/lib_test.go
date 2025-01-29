@@ -88,6 +88,16 @@ func TestGetYaml(t *testing.T) {
 			valuesYaml:          "name: '123456789'\ntpltest: '{{ .Values.name }}'",
 			expectedReturnValue: `{"yaml":"tplname: 123456789","err":"","warning":""}`,
 		},
+		{
+			templateYaml:        "tplname: {{ tpl .Values.tpltest . }}",
+			valuesYaml:          "tpltest: '{{ tpl .Values.tpltest . }}'",
+			expectedReturnValue: `{"yaml":"","err":"template: template:1:12: executing \"template\" at \u003ctpl .Values.tpltest .\u003e: error calling tpl: template: tpl:1:3: executing \"tpl\" at \u003ctpl .Values.tpltest .\u003e: error calling tpl: template: tpl:1:3: executing \"tpl\" at \u003ctpl .Values.tpltest .\u003e: error calling tpl: tpl has been called 3 times, aborting to prevent infinite loops","warning":""}`,
+		},
+		{
+			templateYaml:        "tplname: {{ tpl .Values.tpltest1 . }}",
+			valuesYaml:          "tpltest1: '{{ tpl .Values.tpltest2 . }}'\ntpltest2: '{{ tpl .Values.tpltest1 . }}'",
+			expectedReturnValue: `{"yaml":"","err":"template: template:1:12: executing \"template\" at \u003ctpl .Values.tpltest1 .\u003e: error calling tpl: template: tpl:1:3: executing \"tpl\" at \u003ctpl .Values.tpltest2 .\u003e: error calling tpl: template: tpl:1:3: executing \"tpl\" at \u003ctpl .Values.tpltest1 .\u003e: error calling tpl: tpl has been called 3 times, aborting to prevent infinite loops","warning":""}`,
+		},
 		// Template formatting error
 		{
 			templateYaml:        "name: {{ .Values. }}",
@@ -114,7 +124,7 @@ func TestGetYaml(t *testing.T) {
 	}
 
 	for _, tc := range tests {
-		returnValue := GetYaml(tc.templateYaml, tc.valuesYaml)
+		returnValue := GetYaml(tc.templateYaml, tc.valuesYaml, GetYamlConfig{MaxTplRuns: 3})
 		if returnValue != tc.expectedReturnValue {
 			t.Errorf("\n\ntemplateYaml: %v\n\nvaluesYaml: %v\n\nexpected: %v\n\nactual: %v\n\n", tc.templateYaml, tc.valuesYaml, tc.expectedReturnValue, returnValue)
 		}
