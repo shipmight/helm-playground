@@ -83,7 +83,11 @@ func TestGetYaml(t *testing.T) {
 			valuesYaml:          "name: '123456789'",
 			expectedReturnValue: `{"yaml":"","err":"template: template:5:21: executing \"template\" at \u003cinclude \"foobar.name\" .Values.name\u003e: error calling include: template: template:3:10: executing \"foobar.name\" at \u003cinclude \"foobar.name\" .\u003e: error calling include: template: template:3:10: executing \"foobar.name\" at \u003cinclude \"foobar.name\" .\u003e: error calling include: template: template:3:10: executing \"foobar.name\" at \u003cinclude \"foobar.name\" .\u003e: error calling include: template: template:3:10: executing \"foobar.name\" at \u003cinclude \"foobar.name\" .\u003e: error calling include: template: template:3:10: executing \"foobar.name\" at \u003cinclude \"foobar.name\" .\u003e: error calling include: template: template:3:10: executing \"foobar.name\" at \u003cinclude \"foobar.name\" .\u003e: error calling include: rendering template has a nested reference name: foobar.name","warning":""}`,
 		},
-
+		{
+			templateYaml:        "tplname: {{ tpl .Values.tpltest . }}",
+			valuesYaml:          "name: '123456789'\ntpltest: '{{ .Values.name }}'",
+			expectedReturnValue: `{"yaml":"tplname: 123456789","err":"","warning":""}`,
+		},
 		// Template formatting error
 		{
 			templateYaml:        "name: {{ .Values. }}",

@@ -134,12 +134,40 @@ func GetYaml(templateYaml string, valuesYaml string) string {
 		return val, nil
 	}
 
+
 	// If the template contains `fail`, we don't want to return an error which
 	// would prevent previewing the entire template. Return an empty string.
 	funcMap["fail"] = func(val interface{}) (interface{}, error) {
 		return "", nil
 	}
 
+	/*
+	 * Based on:
+	 * https://github.com/helm/helm/blob/3d1bc72827e4edef273fb3d8d8ded2a25fa6f39d/pkg/engine/engine.go#L128-L152
+	 */
+	// Add tpl function for rendering templates within templates
+	funcMap["tpl"] = func(tpl string, vals interface{}) (interface{}, error) {
+		// Create a new template
+		newTemplate := template.New("tpl")
+		
+		// Add the function map to the template
+		newTemplate.Funcs(funcMap)
+		
+		// Parse the template string
+		parsed, err := newTemplate.Parse(tpl)
+		if err != nil {
+			return "", err
+		}
+		
+		// Execute the template with the provided values
+		var buf bytes.Buffer
+		if err := parsed.Execute(&buf, vals); err != nil {
+			return "", err
+		}
+		
+		return buf.String(), nil
+	}
+	
 	t.Funcs(funcMap)
 
 	t, err := t.Parse(templateYaml)
