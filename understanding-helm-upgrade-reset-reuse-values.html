@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Understanding Helm upgrade flags (with infographics)</title>
+    <meta
+      name="description"
+      content="Every now and then you’ll need to use the --reset-values and --reuse-values flags when running helm upgrade. Let’s dive into how they actually work, and also look at a gotcha when the values of a chart have changed in-between upgrades."
+    />
+    <link rel="stylesheet" href="codemirror/codemirror.css" />
+    <link rel="stylesheet" href="codemirror/material.css" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="icon" type="image/png" href="favicon.png" />
+  </head>
+  <body>
+    <div class="app">
+      <div class="top">
+        <a class="logo" href="/">Helm-playground.com</a>
+        <a class="top__link" href="/cheatsheet.html">Syntax cheatsheet</a>
+        <a class="top__link top__link--active" href="/articles.html"
+          >Articles</a
+        >
+        <a
+          style="margin-left: auto"
+          class="top__link hide-on-mobile"
+          href="https://shipmight.com"
+          >Brought to you by Shipmight - Kubernetes-powered PaaS in your
+          cloud</a
+        >
+      </div>
+      <div class="content content--page">
+        <h2>Understanding Helm upgrade flags</h2>
+
+        <p>
+          This post was originally hosted on
+          <a
+            href="https://shipmight.com/articles/understanding-helm-upgrade-reset-reuse-values"
+            >shipmight.com</a
+          >. It is now archived here.
+        </p>
+        <hr />
+
+        <!-- START ARTICLE -->
+
+        <p>
+          <strong>Update Feb 2024:</strong> Starting from version 3.14.0, Helm
+          includes a new flag <code>--reset-then-reuse-values</code>:
+        </p>
+        <ul>
+          <li>
+            Issue:
+            <a href="https://github.com/helm/helm/issues/8085"
+              >https://github.com/helm/helm/issues/8085</a
+            >
+          </li>
+          <li>
+            Changelog:
+            <a href="https://github.com/helm/helm/releases/tag/v3.14.0"
+              >https://github.com/helm/helm/releases/tag/v3.14.0</a
+            >
+          </li>
+        </ul>
+        <p>Original post retained below, but it is now out-dated.</p>
+        <hr />
+        <p>
+          Every now and then you’ll need to use the
+          <code>--reset-values</code> and <code>--reuse-values</code> flags when
+          running <code>helm upgrade</code>. Let’s dive into how they actually
+          work, and also look at a gotcha when the values of a chart have
+          changed in-between upgrades.
+        </p>
+        <p>Here are the different scenarios visualized in a table:</p>
+        <p>
+          <a href="/images/helm-upgrade-article.table.png">
+            <img
+              src="/images/helm-upgrade-article.table.png"
+              alt="Table of helm upgrade scenarios"
+            />
+          </a>
+        </p>
+        <p>To learn about them in more depth, continue reading…</p>
+        <h2><a href="#contents" id="contents">Contents</a></h2>
+        <ul>
+          <li><a href="#introduction">Introduction</a></li>
+          <li><a href="#default-behaviour">Default behaviour</a></li>
+          <li>
+            <a href="#explicit-behaviour-using-flags"
+              >Explicit behaviour using flags</a
+            >
+          </li>
+          <li>
+            <a href="#--reuse-values-and-schema-change"
+              ><code>--reuse-values</code> and schema change</a
+            >
+          </li>
+          <li><a href="#summary">Summary</a></li>
+        </ul>
+        <h2><a href="#introduction" id="introduction">Introduction</a></h2>
+        <p>
+          The point of Helm is that you can customize parameters of a chart (in
+          Helm lingo, parameters are called just values).
+        </p>
+        <p>
+          For example, as part of the loki-stack chart you can enable and
+          disable components of the stack by setting a value via
+          <code>--set</code>:
+        </p>
+        <pre><code class="lang-bash">helm install example-loki grafana/loki-<span class="hljs-built_in">stack</span> --<span class="hljs-built_in">set</span> grafana.enabled=<span class="hljs-literal">true</span>
+</code></pre>
+        <p>
+          The same applies for upgrading an existing release. You can change a
+          value and the chart is expected to reconfigure itself according to
+          your customization:
+        </p>
+        <pre><code class="lang-bash">helm upgrade example-loki grafana/loki-<span class="hljs-built_in">stack</span> --<span class="hljs-built_in">set</span> grafana.enabled=<span class="hljs-literal">false</span>
+</code></pre>
+        <p>
+          Notice that the chart name had to be specified even though you just
+          wanted to update the values using the same chart that was installed
+          already? That is because the upgrade-command is also able to upgrade
+          the release to a different version of the chart (technically also to
+          any other chart, although that does not sound like a common usecase).
+          A common workflow is to update charts from remote repos, and then
+          upgrade releases to the latest version:
+        </p>
+        <pre><code class="lang-bash">helm repo update
+<span class="hljs-function"><span class="hljs-title">helm</span></span> upgrade ...
+</code></pre>
+        <p>
+          It’s also possible to set a specific version of a chart to upgrade to:
+        </p>
+        <pre><code class="lang-bash">helm upgrade example-loki grafana/loki-stack --version <span class="hljs-number">1.2</span><span class="hljs-number">.3</span>
+</code></pre>
+        <p>
+          The fact that you can reconfigure and update charts is the whole
+          purpose of Helm. I’m sure you are familiar with all of the above if
+          you’ve used Helm before.
+        </p>
+        <p>
+          But the way that configuration changes are merged together may catch
+          you off guard. The upgrade-command contains some internal logic, which
+          can seem inconsistent. It may get even more confusing when the values
+          of the chart you’re upgrading to have changed since the original chart
+          version. I personally had to actually test out the different
+          variations one-by-one to understand all of it fully.
+        </p>
+        <p>
+          The first potential surprise is that the difference in merging
+          behaviour is actually determined by this: are you also setting values
+          during the upgrade?
+        </p>
+        <p>If you are, Helm implicitly uses a “reset values” strategy.</p>
+        <p>If you are not, Helm implicitly uses a “reuse values” strategy.</p>
+        <p>
+          Both of these strategies can also be enforced via CLI flags, which
+          we’ll cover below.
+        </p>
+        <p>
+          Finally, there is also an important gotcha to know related to reusing
+          values when the values schema in the chart has changed. I will also
+          cover that in the end.
+        </p>
+        <h2>
+          <a href="#default-behaviour" id="default-behaviour"
+            >Default behaviour</a
+          >
+        </h2>
+        <p>Let’s go through everything in the form of examples.</p>
+        <p>
+          When you simply upgrade a chart to a new version, your previous values
+          will stay in effect:
+        </p>
+        <p>
+          <a href="/images/helm-upgrade-article.plain-upgrade.png">
+            <img
+              src="/images/helm-upgrade-article.plain-upgrade.png"
+              alt="Infographic of upgrading to a version without setting new values"
+            />
+          </a>
+        </p>
+        <p>This is the “reuse values” strategy I mentioned before.</p>
+        <p>
+          But if you also set some values during the upgrade, your previous
+          values actually get wiped out!
+        </p>
+        <p>
+          <a href="/images/helm-upgrade-article.set-value.png">
+            <img
+              src="/images/helm-upgrade-article.set-value.png"
+              alt="Infographic of upgrading to a version and setting new values"
+            />
+          </a>
+        </p>
+        <p>
+          This is the “reset values” strategy I mentioned before. Values are
+          reset to the default values of the new chart version, and any new
+          values you’ve specified on the CLI are merged on top of that.
+        </p>
+        <p>
+          This can be quite surprising! You need to be careful not to
+          accidentally undo some customization.
+        </p>
+        <h2>
+          <a
+            href="#explicit-behaviour-using-flags"
+            id="explicit-behaviour-using-flags"
+          >
+            Explicit behaviour using flags
+          </a>
+        </h2>
+        <p>You can control which strategy to use via CLI flags.</p>
+        <p>
+          If you are not setting new values, but want to reset to the chart
+          defaults, you can do so via <code>--reset-values</code>:
+        </p>
+        <p>
+          <a href="/images/helm-upgrade-article.reset-values.png">
+            <img
+              src="/images/helm-upgrade-article.reset-values.png"
+              alt="Infographic of upgrading to a version and resetting values"
+            />
+          </a>
+        </p>
+        <p>
+          And in the opposite case, if you are setting new values but want to
+          merge them to previous values, you can use
+          <code>--reuse-values</code>:
+        </p>
+        <p>
+          <a href="/images/helm-upgrade-article.reuse-values.png">
+            <img
+              src="/images/helm-upgrade-article.reuse-values.png"
+              alt="Infographic of upgrading to a version without setting new values"
+            />
+          </a>
+        </p>
+        <p>Simple, right?</p>
+        <p>
+          Well, this works as long as the values schema hasn’t changed in the
+          new chart version. So, for the most part, all clear! But what if the
+          schema has changed…
+        </p>
+        <h2>
+          <a
+            href="#reuse-values-and-schema-change"
+            id="reuse-values-and-schema-change"
+          >
+            <code>--reuse-values</code> and schema change
+          </a>
+        </h2>
+        <p>
+          Sometimes the updated chart has changes in its
+          <code>values.yaml</code>. For example, some section may have been
+          added or an existing one changed a bit. You would expect these changes
+          to be merged into your new release, right?
+        </p>
+        <p>
+          And so they are! But only if you’re not using
+          <code>--reuse-values</code>. Which is confusing, because it makes the
+          flag behave differently from our first example which works almost like
+          <code>--reuse-values</code> but also merges in changes from the chart.
+        </p>
+        <p>
+          So, to clarify… when you do a simple upgrade without setting any
+          values or flags, the updated <code>values.yaml</code> from the new
+          chart version is merged to your release as expected:
+        </p>
+        <p>
+          <a href="/images/helm-upgrade-article.schema-change.png">
+            <img
+              src="/images/helm-upgrade-article.schema-change.png"
+              alt="Infographic of upgrading to a version with schema changes"
+            />
+          </a>
+        </p>
+        <p>
+          But when you want to also update one of the previously set values at
+          the same time, you will naturally use <code>--reuse-values</code> and
+          <code>--set</code>, right? Well, in this case
+          <code>--reuse-values</code> has an unexpected effect. It causes Helm
+          to quite literally “reuse values” from your previous release as the
+          base, disregarding any changes that may have happened in the new chart
+          version:
+        </p>
+        <p>
+          <a href="/images/helm-upgrade-article.schame-change-reuse.png">
+            <img
+              src="/images/helm-upgrade-article.schame-change-reuse.png"
+              alt="Infographic of upgrading to a version with schema changes and with --reuse-values"
+            />
+          </a>
+        </p>
+        <p>
+          This is not the logic you expected, right? You did explicitly ask to
+          reuse values, sure, but why would you expect them not to be merged
+          upon the (updated) default values in the chart first? Especially
+          because that’s the usual behaviour in helm upgrade.
+        </p>
+        <p>
+          At least to me this is very unintuitive, because I would expect a
+          package manager to use the chart values as a base, then merge upon it
+          my previous release values, and finally any additional values I’ve
+          supplied with the upgrade.
+        </p>
+        <!-- Further, if you’d never have used the flag, you would have gotten the more intuitive behaviour. Adding the flag doesn’t just add the logic of reusing values, it also completely deviates the command from default behaviour. -->
+        <p>
+          Your upgrade may fail when this happens, because the templates are
+          likely to fail with your out-of-date values structure. For example, if
+          a new config section has been added to the chart, but your release
+          values actually lacks that entire section, you’ll surely bump into
+          some nil pointer errors.
+        </p>
+        <p>
+          Why is the flag like this? Quoting one of the maintainers from GitHub:
+          “The design goal is to prevent changes from a new chart release’s
+          values from automatically being applied.” Meaning, it is intentional
+          (not a bug) and the behaviour of these flags will not be changed.
+        </p>
+        <p>
+          It is still very confusing, because the behaviour between those
+          seemingly similar commands is so unintuitive and can cause your
+          upgrade to break.
+        </p>
+        <p>
+          As for alternatives, there is an active
+          <a href="https://github.com/helm/helm/issues/8085">GitHub issue</a>
+          from May 2020 with discussion about workarounds and the possibility of
+          a new feature. A new flag like
+          <code>--reset-then-reuse-values</code> could be a future addition to
+          Helm to clear this up (there is an open
+          <a href="https://github.com/helm/helm/pull/9653">PR</a> too).
+        </p>
+        <p>
+          In the meantime, if you want the actually expected
+          <code>--reuse-values</code> behaviour when the chart values have
+          possibly changed, you should dump your old values into a file first,
+          and then use it as a base without <code>--reuse-values</code>:
+        </p>
+        <pre><code class="lang-bash">helm <span class="hljs-built_in">get</span> <span class="hljs-built_in">values</span> <span class="hljs-built_in">example</span>-loki &gt; prev-<span class="hljs-built_in">values</span>.yaml
+helm upgrade <span class="hljs-built_in">example</span>-loki -f prev-<span class="hljs-built_in">values</span>.yaml --set grafana.enabled=<span class="hljs-literal">true</span>
+</code></pre>
+        <p>
+          This way your previous values are merged to the updated chart values,
+          and finally any additional values from the CLI are merged on top of
+          that.
+        </p>
+        <h2><a href="#summary" id="summary">Summary</a></h2>
+        <p>
+          Knowing how these flags work should surely help you reduce debugging
+          time when running helm upgrade. I hope that this article has been
+          helpful for you in illustrating the differences between them.
+        </p>
+        <p>I’ve tried to massage the information into this table:</p>
+        <p>
+          <a href="/images/helm-upgrade-article.table.png">
+            <img
+              src="/images/helm-upgrade-article.table.png"
+              alt="Table of helm upgrade scenarios"
+            />
+          </a>
+        </p>
+        <p>
+          If you ever need to figure out a specific scenario, I recommend
+          creating two local charts via
+          <code>helm create test-chart-1</code> and
+          <code>helm create test-chart-2</code> and upgrading between them, e.g.
+          <code
+            >helm install test test-chart-1 --set foo=bar &amp;&amp; helm
+            upgrade test test-chart-2 --reset-values &amp;&amp; helm get values
+            --all test</code
+          >.
+        </p>
+        <p>
+          I’ve also gathered all the infographics from this article into one big
+          image, so you can pan and zoom around it if that helps you notice the
+          differences:
+        </p>
+        <p>
+          <a href="/images/helm-upgrade-article.infographic.png"
+            ><img
+              src="/images/helm-upgrade-article.infographic.png"
+              alt="Infographic of upgrading to a version without setting new values"
+          /></a>
+        </p>
+
+        <!-- END ARTICLE -->
+
+        <hr />
+
+        <p>
+          Source code for this page can be found on
+          <a href="https://github.com/shipmight/helm-playground">GitHub</a>.
+        </p>
+
+        <p class="ad">
+          FYI! This site uses Fathom Analytics which does not use cookies. Use
+          <a href="https://usefathom.com/ref/4HFQGS" target="_blank"
+            >this link</a
+          >
+          for a $10 discount.
+        </p>
+      </div>
+    </div>
+    <script
+      src="https://cdn.usefathom.com/script.js"
+      data-site="ZNCHLJMX"
+      defer
+    ></script>
+  </body>
+</html>

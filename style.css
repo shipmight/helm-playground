@@ -52,7 +52,7 @@
   --pre-bg: #0f172a;
   --pre-color: #f1f5f9;
 
-  --hr-color: #1e293b;
+  --hr-color: rgb(105, 125, 158);
 
   --ad-color: #94a3b8;
 }
@@ -64,7 +64,9 @@ body {
 }
 
 .app {
+  display: flex;
   flex-direction: column;
+  min-height: 100vh;
 }
 
 .app--playground {
@@ -93,6 +95,10 @@ body {
   color: var(--top-bright);
 }
 
+.top__link--active {
+  text-decoration: underline;
+}
+
 .logo {
   font-size: 11px;
   text-transform: uppercase;
@@ -111,9 +117,9 @@ body {
 
 .content--page {
   padding: 16px 32px;
-  flex: none;
   flex-direction: column;
   overflow: auto;
+  line-height: 1.6;
 }
 
 .content--page > * {
@@ -142,6 +148,15 @@ body {
 .content--page hr {
   border-top: 1px solid var(--hr-color);
   margin: 16px 0;
+}
+
+.content--page img {
+  max-width: 600px;
+}
+
+.content--page ul,
+.content--page ol {
+  padding-left: 24px;
 }
 
 .ad {
