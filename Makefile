@@ -7,7 +7,7 @@ test:
 build:
 	mkdir -p dist
 	rm -f dist/*
-	cp "$(shell go env GOROOT)/misc/wasm/wasm_exec.js" dist/wasm_exec.js
+	cp "$(shell go env GOROOT)/lib/wasm/wasm_exec.js" dist/wasm_exec.js
 	GOOS=js GOARCH=wasm go build -ldflags="-s -w" -o ./dist/lib.wasm go/main/main.go
 
 browser-test:
